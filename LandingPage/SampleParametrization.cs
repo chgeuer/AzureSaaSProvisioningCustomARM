@@ -1,7 +1,6 @@
 ﻿namespace LandingPage
 {
     using Newtonsoft.Json.Linq;
-    using Controllers;
     using Utils;
 
     public class SampleTemplateParametrization
@@ -26,10 +25,17 @@
                 return template.ToString();
             }
 
+            string PatchUIDefinitionjson(string jsonStr)
+            {
+                var json = JObject.Parse(jsonStr);
+                // json["$greetings"] = "Hello World";
+                return json.ToString();
+            }
+
             var patched = (filename) switch
             {
                 "azuredeploy.json" => PatchAzureDeployJson(content, templateInformation.Parametrization),
-                "createUiDefinition.json" => content,
+                "createUiDefinition.json" => PatchUIDefinitionjson(content),
                 _ => content,
             };
 

@@ -4,6 +4,7 @@
     using System.Text.Json;
     using Microsoft.AspNetCore.StaticFiles;
     using Jose;
+    using Microsoft.AspNetCore.Http;
 
     internal static class MyExtensions
     {
@@ -27,5 +28,9 @@
             }
             return contentType;
         }
+
+        //internal static string Foo() {
+        //    return HttpContext.Req
+        //}
     }
 }

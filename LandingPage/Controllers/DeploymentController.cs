@@ -1,7 +1,10 @@
 ﻿namespace LandingPage.Controllers
 {
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Http.Extensions;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Routing;
+    using System;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Utils;
@@ -13,6 +16,15 @@
     {
         private readonly HttpClient httpClient = new HttpClient();
         private readonly DeploymentControllerAppConfiguration cfg;
+
+        internal static string EncodedAddress(HttpRequest request, LinkGenerator linkGenerator, string token, string filename)
+            => Url2.Encode(new Uri(
+                baseUri: new Uri(UriHelper.GetEncodedUrl(request)),
+                relativeUri: linkGenerator.GetPathByAction(
+                    action: nameof(DeploymentController.Get),
+                    controller: nameof(DeploymentController).Replace("Controller", ""),
+                    values: new { token, filename }
+                )).AbsoluteUri);
 
         public DeploymentController(DeploymentControllerAppConfiguration cfg) => (this.cfg) = (cfg);
 
