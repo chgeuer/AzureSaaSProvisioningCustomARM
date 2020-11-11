@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "LandingPage": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "LandingPage_ConnectionStrings__AzureAppConfigurationConnectionString": "Endpoint=https://chgeuer.azconfig.io;Id=KptF-l9-s0:GAVlASo2iGJCGyIaQ+nq;Secret=7OAQnX0ZVX4pvdPKu0jUk0yxl0KXSvTFpZG/s6A/oTQ="
+      },
+      "applicationUrl": "http://localhost:80;https://localhost:443"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  }
+}

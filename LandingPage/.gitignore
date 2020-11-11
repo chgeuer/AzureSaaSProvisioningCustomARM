@@ -1,0 +1,5 @@
+/bin
+/obj
+/accounts
+/certs
+/*.csproj.user

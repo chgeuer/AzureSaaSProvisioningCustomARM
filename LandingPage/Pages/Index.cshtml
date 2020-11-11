@@ -1,0 +1,17 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <p>See the <a href="@(Model.GetAddress("azuredeploy.json"))">azuredeploy.json</a></p>
+    <p>See the <a href="@(Model.GetAddress("createUiDefinition.json"))">createUiDefinition.json</a></p>
+    <p>See the <a href="@(Model.GetAddress("README.md"))">README.md</a></p>
+
+    <p>
+        <a href="@Model.DeploymentURL">
+            <img src="~/images/deploytoazure.svg" alt="Deploy to Azure" />
+        </a>
+    </p>
+</div>
