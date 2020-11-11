@@ -34,7 +34,7 @@
 
             var templateUrl = templateInformation.BaseAddress.AppendPathSegment(filename); 
             
-            var unpatchedContent = await httpClient.GetStringAsync(templateUrl);
+            var unpatchedContent = await httpClient.GetByteArrayAsync(templateUrl);
             
             var patchedContent = templateInformation
                 .Parametrization
@@ -43,8 +43,8 @@
                     content: unpatchedContent, 
                     filename: filename);
             
-            return Content(
-                content: patchedContent.Content, 
+            return File(
+                fileContents: patchedContent.Content, 
                 contentType: patchedContent.ContentType);
         }
 

@@ -1,11 +1,12 @@
 ﻿namespace LandingPage.Utils
 {
     using System;
+    using System.Text;
     using Newtonsoft.Json.Linq;
 
     public interface IContentPatcher
     {
-        PatchedContent Patch(string content, string filename);
+        PatchedContent Patch(byte[] content, string filename);
     }
 
     public class GenericJSONPatcher : IContentPatcher
@@ -15,7 +16,7 @@
         public GenericJSONPatcher(Action<JObject> patchARM = null, Action<JObject> patchUI = null)
             => (this.patchARM, this.patchUI) = (patchARM, patchUI);
 
-        PatchedContent IContentPatcher.Patch(string content, string filename)
+        PatchedContent IContentPatcher.Patch(byte[] content, string filename)
         {
             var patched = (filename) switch
             {
@@ -29,11 +30,21 @@
             return new PatchedContent { Content = patched, ContentType = contentType };
         }
 
-        private static string PatchImpl(string jsonStr, Action<JObject> patcherImpl)
+        private static byte[] PatchImpl(byte[] content, Action<JObject> patcherImpl)
         {
+            if (patcherImpl == null)
+            {
+                return content;
+            }
+
+            var encoding = Encoding.UTF8;
+
+            var jsonStr = encoding.GetString(content);
             var json = JObject.Parse(jsonStr);
-            patcherImpl?.Invoke(json);
-            return json.ToString();
+ 
+            patcherImpl(json); 
+            
+            return encoding.GetBytes(json.ToString());
         }
     }
 }
