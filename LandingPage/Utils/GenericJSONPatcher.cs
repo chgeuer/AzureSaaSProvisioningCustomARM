@@ -3,35 +3,27 @@
     using System;
     using Newtonsoft.Json.Linq;
 
-    public class GenericJSONPatcher<T> : IContentPatcher
+    public class GenericJSONPatcher : IContentPatcher
     {
-        private readonly Action<JObject, T> mutateArmTemplate;
-        private readonly Action<JObject, T> mutateUIDefinition;
-        private readonly T t;
+        private readonly Action<JObject> patchARM;
+        private readonly Action<JObject> patchUI;
 
-        public GenericJSONPatcher(Action<JObject, T> mutateArmTemplate = null, Action<JObject, T> mutateUIDefinition = null, T t = default)
-            => (this.mutateArmTemplate, this.mutateUIDefinition, this.t) = (mutateArmTemplate, mutateUIDefinition, t);
+        public GenericJSONPatcher(Action<JObject> patchARM = null, Action<JObject> patchUI = null)
+            => (this.patchARM, this.patchUI) = (patchARM, patchUI);
+
+        string PatchImpl(string jsonStr, Action<JObject> patcherImpl)
+        {
+            var json = JObject.Parse(jsonStr);
+            patcherImpl?.Invoke(json);
+            return json.ToString();
+        }
 
         public PatchedContent Patch(string filename, string content)
         {
-            string PatchAzureDeployJson(string jsonStr)
-            {
-                var json = JObject.Parse(jsonStr);
-                mutateArmTemplate?.Invoke(json, t);
-                return json.ToString();
-            }
-
-            string PatchUIDefinitionjson(string jsonStr)
-            {
-                var json = JObject.Parse(jsonStr);
-                mutateUIDefinition?.Invoke(json, t);
-                return json.ToString();
-            }
-
             var patched = (filename) switch
             {
-                "azuredeploy.json" => PatchAzureDeployJson(content),
-                "createUiDefinition.json" => PatchUIDefinitionjson(content),
+                "azuredeploy.json" => PatchImpl(content, patchARM),
+                "createUiDefinition.json" => PatchImpl(content, patchUI),
                 _ => content,
             };
 

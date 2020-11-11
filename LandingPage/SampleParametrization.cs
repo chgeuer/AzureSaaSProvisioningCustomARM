@@ -7,19 +7,16 @@
     {
         public string SomeClientInformation { get; set; }
 
-        public IContentPatcher GetContentPatcher() => 
-            new GenericJSONPatcher<SampleTemplateParametrization>(
-                mutateArmTemplate: PatchARMTemplate,
-                mutateUIDefinition: PatchUIDefinition,
-                t: this);
+        public IContentPatcher GetContentPatcher() =>
+            new GenericJSONPatcher(patchARM: PatchARMTemplate, patchUI: PatchUIDefinition);
 
-        internal static void PatchARMTemplate(JObject json, SampleTemplateParametrization parametrization)
+        internal void PatchARMTemplate(JObject json)
         {
             var variables = json.SelectToken("$.variables");
-            variables["dynamically_injected"] = new JObject(new JProperty("some_client_stuff", parametrization.SomeClientInformation));
+            variables["dynamically_injected"] = new JObject(new JProperty("some_client_stuff", this.SomeClientInformation));
         }
 
-        internal static void PatchUIDefinition(JObject json, SampleTemplateParametrization parametrization)
+        internal void PatchUIDefinition(JObject json)
         {
             json["$greetings"] = "Hello World";
         }
