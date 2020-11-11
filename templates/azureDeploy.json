@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configStoreName": {
+      "type": "string"
+    },
+    "letsEncryptSettings": {
+      "type": "object",
+      "defaultValue": {
+        "acceptTermsOfService": "true",
+        "useStagingServer": "true",
+        "emailAddress": "christian.geuer-pollmann@web.de",
+        "domainName": "baldur.geuer-pollmann.de"
+      }
+    }
+  },
+  "variables": {
+    "letsEncryptSettings": "[parameters('letsEncryptSettings')]",
+    "appSettings": [
+      { "k": "ASPNETCORE_ENVIRONMENT", "v": "Development" },
+      { "k": "ASPNETCORE_URLS", "v": "http://localhost:80;https://localhost:443" },
+      { "k": "LettuceEncrypt:AcceptTermsOfService", "v": "[variables('letsEncryptSettings').acceptTermsOfService]" },
+      { "k": "LettuceEncrypt:UseStagingServer", "v": "[variables('letsEncryptSettings').useStagingServer]" },
+      { "k": "LettuceEncrypt:EmailAddress", "v": "[variables('letsEncryptSettings').emailAddress]" },
+      { "k": "LettuceEncrypt:DomainNames:0", "v": "[variables('letsEncryptSettings').domainName]" },
+      { "k": "LandingPage:BaseAdress", "v": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-windows" },
+      { "k": "LandingPage:TemplateName", "v": "azuredeploy.json" },
+      { "k": "LandingPage:UIDefinitionName", "v": "createUiDefinition.json" },
+      { "k": "ApiKey", "v": "SuperSecrewt123.-" }
+    ],
+    "apiVersions": {
+      "appConfiguration": "2020-07-01-preview"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.AppConfiguration/configurationStores",
+      "apiVersion": "[variables('apiVersions').appConfiguration]",
+      "name": "[parameters('configStoreName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "standard"
+      },
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.AppConfiguration/configurationStores/keyValues",
+      "apiVersion": "[variables('apiVersions').appConfiguration]",
+      "dependsOn": [
+        "[concat('Microsoft.AppConfiguration/configurationStores/', parameters('configStoreName'))]"
+      ],
+      "copy": {
+        "name": "appSettings",
+        "count": "[length(variables('appSettings'))]",
+        "mode": "Parallel"
+      },
+      "name": "[concat(parameters('configStoreName'), '/', variables('appSettings')[copyIndex('appSettings')].k)]",
+      "properties": {
+        "value": "[variables('appSettings')[copyIndex('appSettings')].v]",
+        "contentType": "text/plain"
+      }
+    }
+  ]
+}

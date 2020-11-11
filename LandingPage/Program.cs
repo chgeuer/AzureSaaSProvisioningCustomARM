@@ -63,10 +63,7 @@ namespace LandingPage
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => (Configuration) = (configuration);
 
         public IConfiguration Configuration { get; }
 
@@ -75,10 +72,16 @@ namespace LandingPage
             services
                .AddLettuceEncrypt()
                .PersistDataToDirectory(new DirectoryInfo(@"."), Configuration["ApiKey"]);
+            services.AddSingleton(new TemplateDeploymentConfiguration
+            {
+                BaseAdress = Configuration["LandingPage:BaseAdress"],
+                TemplateName = Configuration["LandingPage:TemplateName"],
+                UIDefinitionName = Configuration["LandingPage:UIDefinitionName"],
+                ApiKey = Configuration["ApiKey"],
+            });
 
             services.AddRazorPages();
             services.AddControllers();
-            services.AddSingleton(new DeploymentControllerAppConfiguration { ApiKey = Configuration["ApiKey"] });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,18 +7,17 @@
     {
         public string SomeClientInformation { get; set; }
 
-        public IContentPatcher GetContentPatcher() =>
-            new GenericJSONPatcher(patchARM: PatchARMTemplate, patchUI: PatchUIDefinition);
+        public IContentPatcher CreatePatcher () => new GenericJSONPatcher(patchARM: patchARM, patchUI: patchUI);
 
-        internal void PatchARMTemplate(JObject json)
+        void patchARM(JObject json)
         {
             var variables = json.SelectToken("$.variables");
             variables["dynamically_injected"] = new JObject(new JProperty("some_client_stuff", this.SomeClientInformation));
         }
 
-        internal void PatchUIDefinition(JObject json)
+        void patchUI(JObject json)
         {
-            json["$greetings"] = "Hello World";
+            json["$greetings"] = this.SomeClientInformation;
         }
     }
 }

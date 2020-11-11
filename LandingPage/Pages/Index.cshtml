@@ -5,10 +5,9 @@
 }
 
 <div class="text-center">
-    <p>See the <a href="@(Model.GetAddress("azuredeploy.json"))">azuredeploy.json</a></p>
-    <p>See the <a href="@(Model.GetAddress("createUiDefinition.json"))">createUiDefinition.json</a></p>
+    <p>See the <a href="@(Model.GetAddress(Model.TemplateConfiguration.TemplateName))">@Model.TemplateConfiguration.TemplateName</a></p>
+    <p>See the <a href="@(Model.GetAddress(@Model.TemplateConfiguration.UIDefinitionName))">@Model.TemplateConfiguration.UIDefinitionName</a></p>
     <p>See the <a href="@(Model.GetAddress("README.md"))">README.md</a></p>
-
     <p>
         <a href="@Model.DeploymentURL">
             <img src="~/images/deploytoazure.svg" alt="Deploy to Azure" />
