@@ -5,7 +5,7 @@
 
     public interface IContentPatcher
     {
-        PatchedContent Patch(string filename, string content);
+        PatchedContent Patch(string content, string filename);
     }
 
     public class GenericJSONPatcher : IContentPatcher
@@ -15,7 +15,7 @@
         public GenericJSONPatcher(Action<JObject> patchARM = null, Action<JObject> patchUI = null)
             => (this.patchARM, this.patchUI) = (patchARM, patchUI);
 
-        PatchedContent IContentPatcher.Patch(string filename, string content)
+        PatchedContent IContentPatcher.Patch(string content, string filename)
         {
             var patched = (filename) switch
             {
@@ -24,7 +24,9 @@
                 _ => content,
             };
 
-            return new PatchedContent { Content = patched, ContentType = filename.DetermineContentTypeFromFilename() };
+            var contentType = filename.DetermineContentTypeFromFilename();
+
+            return new PatchedContent { Content = patched, ContentType = contentType };
         }
 
         private static string PatchImpl(string jsonStr, Action<JObject> patcherImpl)

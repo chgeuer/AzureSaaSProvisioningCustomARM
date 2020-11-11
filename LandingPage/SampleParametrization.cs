@@ -3,11 +3,20 @@
     using Newtonsoft.Json.Linq;
     using Utils;
 
-    public class SampleTemplateParametrization
+    public interface IPatcherGenerator
     {
+        IContentPatcher CreatePatcher();
+    }
+
+    public class SampleTemplateParametrization : IPatcherGenerator
+    {
+        /*
+         * This type demonstrates how client-specific information (like `SomeClientInformation`) can be used
+         * to parametrize ARM templates, or createUIDefinitions.
+         */
         public string SomeClientInformation { get; set; }
 
-        public IContentPatcher CreatePatcher() 
+        IContentPatcher IPatcherGenerator.CreatePatcher() 
         {
             void patchARM(JObject json)
             {
