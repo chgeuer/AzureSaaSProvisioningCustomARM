@@ -8,7 +8,7 @@ namespace LandingPage
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using LettuceEncrypt;
-    using Controllers;
+    using Utils;
 
     public class Program
     {

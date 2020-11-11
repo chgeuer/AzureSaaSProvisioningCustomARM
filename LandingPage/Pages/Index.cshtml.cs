@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Logging;
     using Controllers;
+    using Utils;
 
     public class IndexModel : PageModel
     {
@@ -33,19 +34,19 @@
 
         public IActionResult OnGet()
         {
-            var spi = new TemplateInformation
+            var spi = new TemplateInformation<SampleTemplateParametrization>
             {
-                SomeClientInformation = "Greetings",
                 BaseAddress = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-windows",
-                TemplateFile = "azuredeploy.json",
-                UIDefinitionsFile = "createUiDefinition.json",
+                ARMTemplate = "azuredeploy.json",
+                UIDefinitions = "createUiDefinition.json",
+                Parametrization = new SampleTemplateParametrization { SomeClientInformation = "Greetings" },
             };
             this.token = spi.Serialize(_cfg.ApiKey);
 
             DeploymentURL = spi switch
             {
-                { TemplateFile: var tf, UIDefinitionsFile: var ui } when !string.IsNullOrEmpty(ui) => $"https://portal.azure.com/#create/Microsoft.Template/uri/{EncodedAddress(token, tf)}/createUIDefinitionUri/{EncodedAddress(token, ui)}",
-                { TemplateFile: var tf } => $"https://portal.azure.com/#create/Microsoft.Template/uri/{EncodedAddress(token, tf)}",
+                { ARMTemplate: var tf, UIDefinitions: var ui } when !string.IsNullOrEmpty(ui) => $"https://portal.azure.com/#create/Microsoft.Template/uri/{EncodedAddress(token, tf)}/createUIDefinitionUri/{EncodedAddress(token, ui)}",
+                { ARMTemplate: var tf } => $"https://portal.azure.com/#create/Microsoft.Template/uri/{EncodedAddress(token, tf)}",
             };
 
             return Page();
