@@ -5,10 +5,8 @@
     using Microsoft.AspNetCore.Mvc.Filters;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.AspNetCore.StaticFiles;
-    using Microsoft.Extensions.Configuration;
     using Newtonsoft.Json.Linq;
     using System;
-    using System.IO;
     using System.Net.Http;
     using System.Net.Mime;
     using System.Text.Json;
@@ -30,17 +28,40 @@
     {
         public string ApiKey { get; set; }
     }
-     
+
+    public interface IContentPatcher
+    {
+        string Patch(string content);
+    }
+
+    public class AzureDeployTemplatePatcher : IContentPatcher
+    {
+        private readonly TemplateInformation spInfo;
+
+        public AzureDeployTemplatePatcher(TemplateInformation spInfo) => (this.spInfo) = (spInfo);
+
+        private static string PatchTemplateVariable(string templateJson, string variableName, TemplateInformation spInfo)
+        {
+            var template = JObject.Parse(templateJson);
+
+            JToken variables = template.SelectToken("$.variables");
+            variables[variableName] = new JObject(
+                new JProperty("client_data", spInfo.SomeClientInformation)
+                );
+
+            return template.ToString();
+        }
+
+        string IContentPatcher.Patch(string content)
+            => PatchTemplateVariable(templateJson: content, variableName: "dynamically_injected", spInfo: this.spInfo);
+    }
+
     public class TemplateInformation
     {
         public string BaseAddress { get; set; }
         public string TemplateFile { get; set; }
         public string UIDefinitionsFile { get; set; }
         public string SomeClientInformation { get; set; }
-
-        public string Serialize(string secretKey) => this.Serialize<TemplateInformation>(secretKey);
-
-        public static TemplateInformation Deserialize(string token, string secretKey) => MyExtensions.Deserialize<TemplateInformation>(token, secretKey);
     }
 
     internal static class MyExtensions
@@ -65,7 +86,6 @@
             }
             return contentType;
         }
-
     }
 
     [Route("api/[controller]")]
@@ -77,37 +97,27 @@
 
         public DeploymentController(DeploymentControllerAppConfiguration cfg) => (this.cfg) = (cfg);
 
-        private static string PatchTemplateVariable(string templateJson, string variableName, TemplateInformation spInfo)
-        {
-            var template = JObject.Parse(templateJson);
-
-            JToken variables = template.SelectToken("$.variables");
-            variables[variableName] = new JObject(
-                new JProperty("client_data", spInfo.SomeClientInformation)
-                );
-
-            return template.ToString();
-        }
-
+        
 
         [HttpGet]
         [NoCache]
         [Route("{token}/{filename}")]
         public async Task<IActionResult> Get(string token, string filename)
         {
-            var parametrization = TemplateInformation.Deserialize(token, cfg.ApiKey);
+            var parametrization = MyExtensions.Deserialize<TemplateInformation>(token, cfg.ApiKey);
 
+            // https://flurl.dev/docs/fluent-url/
             var templateUrl = Url2.Combine(parametrization.BaseAddress, filename);
-            
+
             var unpatchedContent = await httpClient.GetStringAsync(templateUrl);
-            
-            var variableToPatch = "dynamically_injected";
+
+            IContentPatcher patcher = new AzureDeployTemplatePatcher(parametrization);
 
             var contentType = filename.DetermineContentTypeFromFilename();
 
             return (filename) switch
             {
-                "azuredeploy.json" => Content(PatchTemplateVariable(templateJson: unpatchedContent, variableName: variableToPatch, spInfo: parametrization), contentType),
+                "azuredeploy.json" => Content(patcher.Patch(unpatchedContent), contentType),
                 "createUiDefinition.json" => Content(unpatchedContent, contentType),
                 _ => Content(unpatchedContent, contentType),
             };
