@@ -28,7 +28,7 @@
         public IActionResult OnGet()
         {
             // This is the call where the publisher retrieves client-specific deployment information.
-            Token = RetrieveParametrizationForClient().Serialize(Config.ApiKey);
+            Token = RetrieveParametrizationForClient().SerializeEncryptSign(Config.ApiKey);
 
             GetAddress = (string filename) => Flurl.Url.Decode(DeploymentController.EncodedAddress(HttpContext.Request, linkGenerator, Token, filename), interpretPlusAsSpace: false);
 

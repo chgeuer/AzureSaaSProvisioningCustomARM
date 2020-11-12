@@ -7,7 +7,7 @@
 
     internal static class MyExtensions
     {
-        internal static string Serialize<T>(this T t, string secretKey) =>
+        internal static string SerializeEncryptSign<T>(this T t, string secretKey) =>
             JWT.Encode(
                payload: JsonSerializer.Serialize(t),
                key: secretKey,
@@ -15,7 +15,7 @@
                enc: JweEncryption.A256CBC_HS512,
                compression: JweCompression.DEF);
 
-        internal static T Deserialize<T>(string token, string secretKey) =>
+        internal static T DecryptValidateDeserialize<T>(string token, string secretKey) =>
             JsonSerializer.Deserialize<T>(JWT.Decode(token, secretKey));
 
         internal static string DetermineContentTypeFromFilename(this string filename)

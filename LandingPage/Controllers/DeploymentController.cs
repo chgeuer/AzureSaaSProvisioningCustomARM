@@ -30,7 +30,7 @@
         [Route("{token}/{filename}")]
         public async Task<IActionResult> Get(string token, string filename)
         {
-            T templateInformation = MyExtensions.Deserialize<T>(token, cfg.ApiKey);
+            T templateInformation = MyExtensions.DecryptValidateDeserialize<T>(token, cfg.ApiKey);
 
             var templateUrl =  cfg.ARM.BaseAddress.AppendPathSegment(filename); 
             
