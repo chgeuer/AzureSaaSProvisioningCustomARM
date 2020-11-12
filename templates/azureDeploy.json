@@ -32,7 +32,7 @@
       { "k": "LettuceEncrypt:UseStagingServer", "v": "[variables('letsEncryptSettings').useStagingServer]" },
       { "k": "LettuceEncrypt:EmailAddress", "v": "[variables('letsEncryptSettings').emailAddress]" },
       { "k": "LettuceEncrypt:DomainNames:0", "v": "[variables('letsEncryptSettings').domainName]" },
-      { "k": "LandingPage:BaseAdress", "v": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-windows" },
+      { "k": "LandingPage:BaseAddress", "v": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-windows" },
       { "k": "LandingPage:TemplateName", "v": "azuredeploy.json" },
       { "k": "LandingPage:UIDefinitionName", "v": "createUiDefinition.json" },
       { "k": "ApiKey", "v": "SuperSecrewt123.-" }

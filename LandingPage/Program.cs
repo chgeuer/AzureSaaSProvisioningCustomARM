@@ -77,7 +77,7 @@ namespace LandingPage
                 ApiKey = Configuration["ApiKey"],
                 ARM = new ARMDeploymentInfo
                 {
-                    BaseAddress = Configuration["LandingPage:BaseAdress"],
+                    BaseAddress = Configuration["LandingPage:BaseAddress"],
                     TemplateName = Configuration["LandingPage:TemplateName"],
                     UIDefinitionName = Configuration["LandingPage:UIDefinitionName"],
                 },

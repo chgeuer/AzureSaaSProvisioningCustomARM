@@ -138,6 +138,22 @@ The ARM template is handed to our code as a `Newtonsoft.Json.Linq.JObject`, whic
 
 However, you have full control over the JSON structure, and can do whatever you like. 
 
+### Configuration
+
+This sample stores the majority of its configuration inside an Azure App Configuration instance, but you can easily change that to a different mechanism, just swap out `Microsoft.Azure.AppConfiguration.AspNetCore` and use something else.
+
+#### Assumptions
+
+This sample assumes that there is an unparametrized ARM template etc. sitting somewhere in HTTP space. **This sample only supports a single template**. In the screenshot below, you can see a few configuration settings:
+
+- `LandingPage:BaseAddress` contains HTTP address relative to which all file names will be evaluated.  Traditionally, that would be the one showing up in `"[deployment().properties.templateLink.uri]"`.
+- `LandingPage:TemplateName` is the filename of the main ARM template. Usually, it's something like `azureDeploy.json`, but doesn't have to be. 
+- `LandingPage:UIDefinitionName`: *If* your deployment should leverage some wizard-like UI experience in the Azure portal, you can point towards your `createUiDefinition.json` (in case you have one).
+- `ApiKey`: In our app, the `Index.cshtml` page generates an encrypted token so that the `DeploymentController` can decrypt and validate the signature. I'm currently using the `ApiKey` setting as content encryption key and HMAC key for the JOSE library.
+
+
+![](docs/images/20201112153915.png)
+
 ### Prevent HTTP caching
 
 When a customer deploys an ARM template to the Azure portal via a link like `https://portal.azure.com/#create/Microsoft.Template/uri/...`, 
