@@ -2,13 +2,22 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+
+    // Just a quick debug hack to test direct downloads from the API
+    var x = Flurl.Url.ParsePathSegments(Model.DeploymentURL);
+    var directTemplatelink = x.Count() > 6 ? Flurl.Url.Decode(x.ElementAt(6), false) : "";
+    var directUILink = x.Count() == 9 ? Flurl.Url.Decode(x.ElementAt(8), false) : "";
 }
 
-<div class="text-center">
-    <p>See the <a href="@(Model.GetAddress(Model.Config.ARM.TemplateName))">@Model.Config.ARM.TemplateName</a></p>
-    <p>See the <a href="@(Model.GetAddress(Model.Config.ARM.UIDefinitionName))">@Model.Config.ARM.UIDefinitionName</a></p>
-    <p>See the <a href="@(Model.GetAddress("README.md"))">README.md</a></p>
+<div>
+    <h3>Try to download a few files directly</h3>
+    <ul>
+        <li>See the <a href="@(directTemplatelink)">@Model.Config.ARM.TemplateName</a></li>
+        <li>See the <a href="@(directUILink)">@Model.Config.ARM.UIDefinitionName</a></li>
+    </ul>
+</div>
 
+<div class="text-center">
     <p>
         <a href="@Model.DeploymentURL">
             <img src="~/images/deploytoazure.svg" alt="Deploy to Azure" />

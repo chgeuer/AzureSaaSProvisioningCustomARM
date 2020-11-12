@@ -1,6 +1,5 @@
 ﻿namespace LandingPage.Pages
 {
-    using System;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,11 +12,10 @@
     {
         private readonly ILogger<IndexModel> logger;
         private readonly LinkGenerator linkGenerator;
+        private string Token { get; set; }
 
         public LandingPageConfiguration Config { get; private set; }
-        public string DeploymentURL { get; set; }
-        public string Token { get; set; }
-        public Func<string, string> GetAddress { get; set; } // Only needed for debugging...
+        public string DeploymentURL { get; private set; }
 
         public IndexModel(LandingPageConfiguration cfg, ILogger<IndexModel> logger, LinkGenerator linkGenerator)
             => (this.Config, this.logger, this.linkGenerator) = (cfg, logger, linkGenerator);
@@ -30,16 +28,16 @@
             // This is the call where the publisher retrieves client-specific deployment information.
             Token = RetrieveParametrizationForClient().SerializeEncryptSign(Config.ApiKey);
 
-            GetAddress = (string filename) => Flurl.Url.Decode(DeploymentController.EncodedAddress(HttpContext.Request, linkGenerator, Token, filename), interpretPlusAsSpace: false);
+            string protect(string fn) => DeploymentController.ProtectAddress(
+                HttpContext.Request, linkGenerator, Token, fn);
 
-            string encoded(string fn) => DeploymentController.EncodedAddress(HttpContext.Request, linkGenerator, Token, fn);
-
-            var info = Config.ARM;
+            var (azuredeploy_json, createuidefinition_json) =
+                (Config.ARM.TemplateName, Config.ARM.UIDefinitionName);
 
             var prefix = "https://portal.azure.com/#create/Microsoft.Template";
-            DeploymentURL = info.HasCustomUI
-                ? $"{prefix}/uri/{encoded(info.TemplateName)}/createUIDefinitionUri/{encoded(info.UIDefinitionName)}"
-                : $"{prefix}/uri/{encoded(info.TemplateName)}";
+            DeploymentURL = Config.ARM.HasCustomUI
+                ? $"{prefix}/uri/{protect(azuredeploy_json)}/createUIDefinitionUri/{protect(createuidefinition_json)}"
+                : $"{prefix}/uri/{protect(azuredeploy_json)}";
 
             return Page();
         }

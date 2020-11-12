@@ -161,4 +161,4 @@ the Azure portal's backend system fetches the ARM template, and potentially UI d
 address point the concrete JSON files for a deployment. The Azure backend issues an unauthenticated HTTP GET to fetch the JSON files.
 
 The Azure backend's HTTP client respects HTTP headers, like cache durations. The can become a problem in situations where an asset 
-should not be cached. The `NoCacheAttribute` in the solution prevents Azure from caching. 
+should not be cached. The `[ResponseCache]` attribute on the `DeploymentController` prevents Azure from caching. 

@@ -25,8 +25,18 @@
 
         public DeploymentControllerBase(LandingPageConfiguration cfg) => (this.cfg) = (cfg);
 
+        internal static string ProtectAddress(HttpRequest request, LinkGenerator linkGenerator, string token, string filename)
+        {
+            var controllerPath = linkGenerator.GetPathByAction(
+                action: nameof(DeploymentController.Get),
+                controller: nameof(DeploymentController).Replace("Controller", ""),
+                values: new { token = token, filename = filename }); // these must match the parameter names for the `Get` method below. 
+
+            return Url2.Encode(request.GetEncodedUrl().AppendPathSegment(controllerPath)); // https://flurl.dev/docs/fluent-url/
+        }
+
         [HttpGet]
-        [NoCache]
+        [ResponseCache(Duration=0, Location=ResponseCacheLocation.None, NoStore=true)]
         [Route("{token}/{filename}")]
         public async Task<IActionResult> Get(string token, string filename)
         {
@@ -46,16 +56,6 @@
             return File(
                 fileContents: patchedContent.Content, 
                 contentType: patchedContent.ContentType);
-        }
-
-        internal static string EncodedAddress(HttpRequest request, LinkGenerator linkGenerator, string token, string filename)
-        {
-            var controllerPath = linkGenerator.GetPathByAction(
-                action: nameof(DeploymentController.Get),
-                controller: nameof(DeploymentController).Replace("Controller", ""),
-                values: new { token = token, filename = filename });
-
-            return Url2.Encode(request.GetEncodedUrl().AppendPathSegment(controllerPath)); // https://flurl.dev/docs/fluent-url/
         }
     }
 }
