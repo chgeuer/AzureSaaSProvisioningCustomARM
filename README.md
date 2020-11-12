@@ -99,7 +99,7 @@ By making the (encrypted) parametrization part of the path, the solution can sim
 
 ### Interactions
 
-![Swimlane diagram](20201112172801.png)
+![Swimlane diagram from https://swimlanes.io/u/lkeC4nzXF](docs/images/20201112172801.png)
 
 Source of [the swimelane diagram](https://swimlanes.io/u/lkeC4nzXF).
 
