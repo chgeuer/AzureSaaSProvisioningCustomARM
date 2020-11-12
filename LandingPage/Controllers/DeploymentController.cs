@@ -18,7 +18,7 @@
     [Route("api/[controller]")]
     [ApiController]
     public class DeploymentControllerBase<T> : ControllerBase
-        where T: IPatcherGenerator 
+        where T: IPatcherGenerator
     {
         private readonly HttpClient httpClient = new HttpClient();
         private readonly LandingPageConfiguration cfg;
@@ -30,18 +30,17 @@
         [Route("{token}/{filename}")]
         public async Task<IActionResult> Get(string token, string filename)
         {
-            TemplateInformation<T> templateInformation = MyExtensions.Deserialize<TemplateInformation<T>>(token, cfg.ApiKey);
+            T templateInformation = MyExtensions.Deserialize<T>(token, cfg.ApiKey);
 
-            var templateUrl =  cfg.ARMDeploymentInfo.BaseAddress.AppendPathSegment(filename); 
+            var templateUrl =  cfg.ARM.BaseAddress.AppendPathSegment(filename); 
             
             var unpatchedContent = await httpClient.GetByteArrayAsync(templateUrl);
             
             var patchedContent = templateInformation
-                .Parametrization
                 .CreatePatcher()
                 .Patch(
                     content: unpatchedContent,
-                    dft: cfg.ARMDeploymentInfo.DetermineFiletype(filename),
+                    dft: cfg.ARM.DetermineFiletype(filename),
                     filename: filename);
             
             return File(

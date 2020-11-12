@@ -5,8 +5,8 @@
 }
 
 <div class="text-center">
-    <p>See the <a href="@(Model.GetAddress(Model.TemplateConfiguration.ARMDeploymentInfo.TemplateName))">@Model.TemplateConfiguration.ARMDeploymentInfo.TemplateName</a></p>
-    <p>See the <a href="@(Model.GetAddress(Model.TemplateConfiguration.ARMDeploymentInfo.UIDefinitionName))">@Model.TemplateConfiguration.ARMDeploymentInfo.UIDefinitionName</a></p>
+    <p>See the <a href="@(Model.GetAddress(Model.Config.ARM.TemplateName))">@Model.Config.ARM.TemplateName</a></p>
+    <p>See the <a href="@(Model.GetAddress(Model.Config.ARM.UIDefinitionName))">@Model.Config.ARM.UIDefinitionName</a></p>
     <p>See the <a href="@(Model.GetAddress("README.md"))">README.md</a></p>
 
     <p>

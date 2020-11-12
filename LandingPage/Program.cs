@@ -75,7 +75,7 @@ namespace LandingPage
             services.AddSingleton(new LandingPageConfiguration
             {
                 ApiKey = Configuration["ApiKey"],
-                ARMDeploymentInfo = new ARMDeploymentInfo
+                ARM = new ARMDeploymentInfo
                 {
                     BaseAddress = Configuration["LandingPage:BaseAdress"],
                     TemplateName = Configuration["LandingPage:TemplateName"],
