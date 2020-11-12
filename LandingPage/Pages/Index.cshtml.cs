@@ -35,9 +35,11 @@
             string encoded(string fn) => DeploymentController.EncodedAddress(HttpContext.Request, linkGenerator, Token, fn);
 
             var info = Config.ARM;
+
+            var prefix = "https://portal.azure.com/#create/Microsoft.Template";
             DeploymentURL = info.HasCustomUI
-                ? $"https://portal.azure.com/#create/Microsoft.Template/uri/{encoded(info.TemplateName)}/createUIDefinitionUri/{encoded(info.UIDefinitionName)}"
-                : $"https://portal.azure.com/#create/Microsoft.Template/uri/{encoded(info.TemplateName)}";
+                ? $"{prefix}/uri/{encoded(info.TemplateName)}/createUIDefinitionUri/{encoded(info.UIDefinitionName)}"
+                : $"{prefix}/uri/{encoded(info.TemplateName)}";
 
             return Page();
         }
