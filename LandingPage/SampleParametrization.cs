@@ -3,11 +3,6 @@
     using Newtonsoft.Json.Linq;
     using Utils;
 
-    public interface IPatcherGenerator
-    {
-        IContentPatcher CreatePatcher();
-    }
-
     public class SampleTemplateParametrization : IPatcherGenerator
     {
         /*

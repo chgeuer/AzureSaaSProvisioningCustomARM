@@ -4,11 +4,6 @@
     using System.Text;
     using Newtonsoft.Json.Linq;
 
-    public interface IContentPatcher
-    {
-        PatchedContent Patch(byte[] content, string filename);
-    }
-
     public class GenericJSONPatcher : IContentPatcher
     {
         private readonly Action<JObject> patchARM, patchUI;
@@ -16,13 +11,14 @@
         public GenericJSONPatcher(Action<JObject> patchARM = null, Action<JObject> patchUI = null)
             => (this.patchARM, this.patchUI) = (patchARM, patchUI);
 
-        PatchedContent IContentPatcher.Patch(byte[] content, string filename)
+        PatchedContent IContentPatcher.Patch(byte[] content, DeploymentFileType dft, string filename)
         {
-            var patched = (filename) switch
+            var patched = (dft) switch
             {
-                "azuredeploy.json" => PatchImpl(content, patchARM),
-                "createUiDefinition.json" => PatchImpl(content, patchUI),
-                _ => content,
+                DeploymentFileType.ARMTemplate => PatchImpl(content, patchARM),
+                DeploymentFileType.UIDefinitions=> PatchImpl(content, patchUI),
+                DeploymentFileType.Other => content,
+                _ => throw new NotSupportedException($"Unsupported value for {nameof(dft)} ({typeof(DeploymentFileType)})")
             };
 
             var contentType = filename.DetermineContentTypeFromFilename();

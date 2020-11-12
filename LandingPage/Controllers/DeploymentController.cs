@@ -12,7 +12,7 @@
 
     public class DeploymentController : DeploymentControllerBase<SampleTemplateParametrization>
     {
-        public DeploymentController(TemplateDeploymentConfiguration cfg) : base(cfg) { }
+        public DeploymentController(LandingPageConfiguration cfg) : base(cfg) { }
     }
 
     [Route("api/[controller]")]
@@ -21,9 +21,9 @@
         where T: IPatcherGenerator 
     {
         private readonly HttpClient httpClient = new HttpClient();
-        private readonly TemplateDeploymentConfiguration cfg;
+        private readonly LandingPageConfiguration cfg;
 
-        public DeploymentControllerBase(TemplateDeploymentConfiguration cfg) => (this.cfg) = (cfg);
+        public DeploymentControllerBase(LandingPageConfiguration cfg) => (this.cfg) = (cfg);
 
         [HttpGet]
         [NoCache]
@@ -32,7 +32,7 @@
         {
             TemplateInformation<T> templateInformation = MyExtensions.Deserialize<TemplateInformation<T>>(token, cfg.ApiKey);
 
-            var templateUrl = templateInformation.BaseAddress.AppendPathSegment(filename); 
+            var templateUrl =  cfg.ARMDeploymentInfo.BaseAddress.AppendPathSegment(filename); 
             
             var unpatchedContent = await httpClient.GetByteArrayAsync(templateUrl);
             
@@ -40,7 +40,8 @@
                 .Parametrization
                 .CreatePatcher()
                 .Patch(
-                    content: unpatchedContent, 
+                    content: unpatchedContent,
+                    dft: cfg.ARMDeploymentInfo.DetermineFiletype(filename),
                     filename: filename);
             
             return File(

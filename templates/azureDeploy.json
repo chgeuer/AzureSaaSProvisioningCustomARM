@@ -16,6 +16,14 @@
     }
   },
   "variables": {
+    "names": {
+      "registryName": "[parameters('configStoreName')]"
+    },
+    "acr": {
+      "repository": "helloworld-node", 
+      "taskRunName": "myquickdockerbuildrun"
+    },
+    "imageName": "[concat(variables('acr').repository, ':', variables('acr').taskRunName)]",
     "letsEncryptSettings": "[parameters('letsEncryptSettings')]",
     "appSettings": [
       { "k": "ASPNETCORE_ENVIRONMENT", "v": "Development" },
@@ -30,7 +38,8 @@
       { "k": "ApiKey", "v": "SuperSecrewt123.-" }
     ],
     "apiVersions": {
-      "appConfiguration": "2020-07-01-preview"
+      "appConfiguration": "2020-07-01-preview",
+      "containerRegistry": "2019-12-01-preview"
     }
   },
   "resources": [
@@ -60,6 +69,46 @@
         "value": "[variables('appSettings')[copyIndex('appSettings')].v]",
         "contentType": "text/plain"
       }
+    },
+
+
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "name": "[variables('names').registryName]",
+      "apiVersion": "[variables('apiVersions').containerRegistry]",
+      "location": "[resourceGroup().location]",
+      "comments": "Container registry for storing docker images",
+      "tags": {
+        "displayName": "Container Registry",
+        "container.registry": "[variables('names').registryName]"
+      },
+      "sku": { "name": "Standard", "tier": "Standard" },
+      "properties": {
+        "adminUserEnabled": false
+      },
+      "resources": [
+        {
+          "type": "taskRuns",
+          "name": "[parameters('taskRunName')]",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "[variables('apiVersions').containerRegistry]",
+          "dependsOn": [
+            "[variables('names').registryName]"
+          ],
+          "properties": {
+            "runRequest": {
+              "type": "DockerBuildRequest",
+              "dockerFilePath": "LandingPage/Dockerfile",
+              "imageNames": [
+                "[variables('imageName')]"
+              ],
+              "sourceLocation": "https://github.com/chgeuer/AzureSaaSProvisioningCustomARM.git",
+              "isPushEnabled": true,
+              "platform": { "os": "linux", "architecture": "amd64" }
+            }
+          }
+        }
+      ]
     }
   ]
 }

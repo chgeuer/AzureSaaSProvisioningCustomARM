@@ -72,12 +72,15 @@ namespace LandingPage
             services
                .AddLettuceEncrypt()
                .PersistDataToDirectory(new DirectoryInfo(@"."), Configuration["ApiKey"]);
-            services.AddSingleton(new TemplateDeploymentConfiguration
+            services.AddSingleton(new LandingPageConfiguration
             {
-                BaseAdress = Configuration["LandingPage:BaseAdress"],
-                TemplateName = Configuration["LandingPage:TemplateName"],
-                UIDefinitionName = Configuration["LandingPage:UIDefinitionName"],
                 ApiKey = Configuration["ApiKey"],
+                ARMDeploymentInfo = new ARMDeploymentInfo
+                {
+                    BaseAddress = Configuration["LandingPage:BaseAdress"],
+                    TemplateName = Configuration["LandingPage:TemplateName"],
+                    UIDefinitionName = Configuration["LandingPage:UIDefinitionName"],
+                },
             });
 
             services.AddRazorPages();
