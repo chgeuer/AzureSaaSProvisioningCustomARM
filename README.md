@@ -97,6 +97,47 @@ In this example,
 
 By making the (encrypted) parametrization part of the path, the solution can simply point to other assets (nested templates, shell scripts, etc.), without breaking the `"[deployment().properties.templateLink.uri]"` [mechanism](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-deployment#remarks) in your ARM template. 
 
+### Customizing this sample
+
+This sample ships with a trivial on-the-fly modification (implemented in `SampleParametrization`):
+
+```c#
+using Newtonsoft.Json.Linq;
+using Utils;
+
+public class SampleTemplateParametrization : IPatcherGenerator
+{
+    /* This type demonstrates how client-specific information
+     * (like `SomeClientInformation`) can be used to 
+     * parametrize ARM templates, or createUIDefinitions.*/
+    public string SomeClientInformation { get; set; }
+
+    IContentPatcher IPatcherGenerator.CreatePatcher() 
+    {
+        void patchARM(JObject json)
+        {
+            var variables = json.SelectToken("$.variables");
+ 
+            variables["dynamically_injected"] = new JObject(
+                new JProperty("some_client_stuff", this.SomeClientInformation));
+        }
+
+        void patchUI(JObject json)
+        {
+            json["$greetings"] = this.SomeClientInformation;
+        }
+
+        return new GenericJSONPatcher(patchARM: patchARM, patchUI: patchUI);
+    }
+}
+```
+
+In this example, the only information we need for parametrization is the `SomeClientInformation` string. We create a 'patcher', which is configured to patch both ARM templates (in the `patchARM` function), and UI definitions (in the `patchUI` function).
+
+The ARM template is handed to our code as a `Newtonsoft.Json.Linq.JObject`, which we can modify. As you can see, the code adds an additional ARM variable called `dynamically_injected`. For the `createUiDefinition.json` file, I just added a `$greetings` string property to the root of the document.
+
+However, you have full control over the JSON structure, and can do whatever you like. 
+
 ### Prevent HTTP caching
 
 When a customer deploys an ARM template to the Azure portal via a link like `https://portal.azure.com/#create/Microsoft.Template/uri/...`, 
