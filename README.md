@@ -160,11 +160,17 @@ This sample assumes that there is an unparametrized ARM template etc. sitting so
 
 ![](docs/images/20201112153915.png)
 
+### Design Decisions
+
+- Make sure that all 'expensive' / potentially failing background work happens while the user is on the landing page: 
+  - For example, if certain resources should be created to be included in the ARM template, do this prior to the user clicking "Deploy to Azure", and include all relevant information in the JOSE payload.
+  - This ensures that, once the Azure portal in the back pulls the ARM templates, all required data is available, and the user doesn't have to deal with funky backend problems on the ISV side. 
+
 ### Prevent HTTP caching
 
 When a customer deploys an ARM template to the Azure portal via a link like `https://portal.azure.com/#create/Microsoft.Template/uri/...`, 
 the Azure portal's backend system fetches the ARM template, and potentially UI definitions. The URI-encoded URLs in the fragment of the 
 address point the concrete JSON files for a deployment. The Azure backend issues an unauthenticated HTTP GET to fetch the JSON files.
 
-The Azure backend's HTTP client respects HTTP headers, like cache durations. The can become a problem in situations where an asset 
+The Azure back end's HTTP client respects HTTP headers, like cache durations. The can become a problem in situations where an asset 
 should not be cached. The `[ResponseCache]` attribute on the `DeploymentController` prevents Azure from caching. 
