@@ -97,6 +97,12 @@ In this example,
 
 By making the (encrypted) parametrization part of the path, the solution can simply point to other assets (nested templates, shell scripts, etc.), without breaking the `"[deployment().properties.templateLink.uri]"` [mechanism](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-deployment#remarks) in your ARM template. 
 
+### Interactions
+
+![Swimlane diagram](20201112172801.png)
+
+Source of [the swimelane diagram](https://swimlanes.io/u/lkeC4nzXF).
+
 ### Customizing this sample
 
 This sample ships with a trivial on-the-fly modification (implemented in `SampleParametrization`):
